@@ -1,1 +1,115 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %} {% endblock %}
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %} 
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 align="center">{{ event[1] }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p align="center">{{ event[4] }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p align="center">Event starts on {{ event[2]}} and ends on {{ event[3] }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Venue</h3>                    
+                </div>
+                <div class="card-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>{{ venue[0] }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Room: {{ venue[1] }}</p>
+                            <p>Max Occupancy: {{ venue[2] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Equipment</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for equipment in equipments %}
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>{{ equipment[0] }}</h4>
+                                </div>
+                                <div class="card-body">
+                                    <p>Quantity: {{ equipment[1] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Budget</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for budget in budgets %}
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>{{ budget[0] }}</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Amount: {{ budget[1] }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Expenses</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for expense in expenses %}
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>{{ expense[0] }}</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Assigned to: {{ expense[1] }}</p>
+                                        <p>Due on: {{ expense[2] }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

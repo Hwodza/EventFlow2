@@ -1,0 +1,21 @@
+.card {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+
+}
+
+.card .team {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+}
+
+.card .team .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 128px;
+}

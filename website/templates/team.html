@@ -1,15 +1,74 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
+<h1>{{ team[1] }}</h1>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Future and Present Events</h3>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    <h3>Future and Ongoing Events</h3>
+                </div>
+                {% if admin %}
+                    <div class="col-md-2">
+                        <a href="/create_event/{{ team[0] }}" class="btn btn-success">Create Event</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for event in events %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>{{ event[1] }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ event[2] }}</p>
+                                <p>{{ event[3] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/event/{{ event[0] }}" class="btn btn-primary">View Event</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Members</h3>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Members</h3>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for member in members %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>{{ member[0] + " " + member[1] }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ member[2] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/profile/{{ member[0] }}" class="btn btn-primary">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
+    
+</div>
+<div class="container-fluid">
+    
     <div class="row">
         <div class="col-md-12">
             <h3>Past Events</h3>

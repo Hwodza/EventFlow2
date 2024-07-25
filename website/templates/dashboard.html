@@ -1,4 +1,5 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
+<h1>Hello {{ user[1] }}</h1>
 <div class="container-fluid">
     <div class="card">
         <div class="card-header">
@@ -7,13 +8,27 @@
                     <h3>Teams</h3>
                 </div>
                 <div class="col-sm-2">
-                    <button class="btn btn-success" type="button">Add Team</button>
+                    <button class="btn btn-success" type="button">Join Team</button>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="row">
-                
+                {% for team in teams %}
+                    <div class="col-md-4">
+                        <div class="card team">
+                            <div class="card-header">
+                                <h4>{{ team[1] }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ team[2] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/team/{{ team[0] }}" class="btn btn-primary">View Team</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -22,11 +37,8 @@
     <div class="card">
         <div class="card-header">
             <div class="row">
-                <div class="col-sm-10">
-                    <h3>Events</h3>
-                </div>
-                <div class="col-sm-2">
-                    <button class="btn btn-success" type="button">Add Member</button>
+                <div class="col-sm-12">
+                    <h3>Upcoming Events You're registered for</h3>
                 </div>
             </div>
         </div>
