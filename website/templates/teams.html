@@ -1,3 +1,35 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %} 
-
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    Available Teams to Join
+                </div>
+                <div class="col-md-2">
+                    <a href="/create_team" class="btn btn-success">Create Team</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for team in teams %}
+                    <div class="col-md-4">
+                        <div class="card team">
+                            <div class="card-header">
+                                <h4>{{ team[1] }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ team[2] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/team/{{ team[0] }}" class="btn btn-primary">View Team</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

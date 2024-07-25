@@ -70,6 +70,18 @@ def team(team_id):
     return render_template("team.html", team=fetchdata[0], members=fetchdata2, member=member, admin=admin, events=fetchdata3)
 
 
+@app.route('/teams')
+def teams():
+    if 'user_id' not in session:
+        flash('Please Log in First!', category='error')
+        return redirect(url_for('login'))
+    cur = db.connection.cursor()
+    cur.execute("SELECT * FROM team")
+    fetchdata = cur.fetchall()
+    cur.close()
+    return render_template("teams.html", teams=fetchdata)
+
+
 @app.route('/create_event/<team_id>', methods=['GET', 'POST'])
 def create_event(team_id):
     if 'user_id' not in session:
