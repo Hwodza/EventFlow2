@@ -23,7 +23,17 @@
                                 <p>{{ team[2] }}</p>
                             </div>
                             <div class="card-footer">
-                                <a href="/team/{{ team[0] }}" class="btn btn-primary">View Team</a>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <a href="/team/{{ team[0] }}" class="btn btn-primary">View Team</a>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <form method="post">
+                                            <input type="hidden" name="team_id" value="{{ team[0] }}">
+                                            <button type="submit" class="btn btn-success">Join Team</button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

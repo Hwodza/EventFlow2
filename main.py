@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'EventFlowDB'
+app.config['MYSQL_DB'] = 'eventflowdb'
 db = MySQL(app)
 
 
@@ -70,16 +70,44 @@ def team(team_id):
     return render_template("team.html", team=fetchdata[0], members=fetchdata2, member=member, admin=admin, events=fetchdata3)
 
 
-@app.route('/teams')
+@app.route('/teams', methods=['GET', 'POST'])
 def teams():
     if 'user_id' not in session:
         flash('Please Log in First!', category='error')
         return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        cur = db.connection.cursor()
+        cur.execute("INSERT INTO comprised (team_id, user_id, role) VALUES (%s, %s, %s)", (data['team_id'], session['user_id'], 'member'))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=data['team_id']))
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM team")
     fetchdata = cur.fetchall()
     cur.close()
     return render_template("teams.html", teams=fetchdata)
+
+
+@app.route('/create_team', methods=['GET', 'POST'])
+def create_team():
+    if 'user_id' not in session:
+        flash('Please Log in First!', category='error')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        data = request.form
+        cur = db.connection.cursor()
+        cur.execute("SELECT MAX(cast(team_id as unsigned)) FROM team")
+        fetchdata = cur.fetchall()
+        cur.close()
+        team_id = int(fetchdata[0][0]) + 1
+        cur = db.connection.cursor()
+        cur.execute("INSERT INTO team (team_id, team_name, description) VALUES (%s, %s, %s)", (team_id, data['team_name'], data['team_description'],))
+        cur.execute("INSERT INTO comprised (team_id, user_id, role) VALUES (%s, %s, %s)", (team_id, session['user_id'], 'admin'))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=team_id))
+    return render_template("create_team.html")
 
 
 @app.route('/create_event/<team_id>', methods=['GET', 'POST'])

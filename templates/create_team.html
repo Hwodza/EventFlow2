@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %} 
+<div class="container-fluid">
+    <form method="POST">
+        <div class="form-group">
+            <label for="team_name">Team Name</label>
+            <input type="text" class="form-control" id="team_name" name="team_name" placeholder="Enter team name" />
+        </div>
+        <div class="form-group">
+            <label for="team_description">Team Description</label>
+            <textarea class="form-control" id="team_description" name="team_description" placeholder="Enter team description"></textarea>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Create Team</button>
+    </form>
+</div>
+{% endblock%}
