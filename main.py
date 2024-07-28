@@ -68,7 +68,8 @@ def team(team_id):
     fetchdata2 = cur.fetchall()
     cur.close()
     cur = db.connection.cursor()
-    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s and plans.event_id=event.event_id", (team_id))
+    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s", (team_id,))
+    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s AND plans.event_id=event.event_id", (team_id,))
     fetchdata3 = cur.fetchall()
     cur.close()
     member = False
@@ -156,7 +157,27 @@ def event(event_id):
     cur.execute("SELECT building, room, max_people FROM hosted_at, venue WHERE event_id=%s and hosted_at.venue_id=venue.venue_id", (event_id,))
     fetchdata2 = cur.fetchall()
     cur.close()
-    return render_template("event.html", event=fetchdata[0], venue=fetchdata2[0])
+    cur = db.connection.cursor()
+    cur.execute("SELECT equipment_type, quantity, start_date, end_date FROM equipment, uses WHERE event_id=%s and equipment.equipment_id=uses.equipment_id", (event_id,))
+    fetchdata3 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT total_budget, remaining_budget, budget_description FROM budget, allocated WHERE event_id=%s and budget.budget_id=allocated.budget_id", (event_id,))
+    fetchdata4 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT purchase_description, purchase_amount, purchase_date FROM expenses, has WHERE event_id=%s and expenses.purchase_id=has.purchase_id", (event_id,))
+    fetchdata5 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT user.user_id, role FROM user, comprised, plans WHERE user.user_id=%s and comprised.user_id=user.user_id and comprised.team_id=plans.team_id and plans.event_id=%s and user.user_id=comprised.user_id", (session['user_id'], event_id,))
+    fetchdata6 = cur.fetchall()
+    admin = True
+    for user in fetchdata6:
+        if user[1] == 'admin' and user[0] == session['user_id']:
+            admin = True
+    cur.close()
+    return render_template("event.html", event=fetchdata[0], venue=fetchdata2[0], equipments=fetchdata3, budgets=fetchdata4, expenses=fetchdata5, admin=admin)
 
 
 @app.route('/login', methods=['GET', 'POST'])
