@@ -47,6 +47,18 @@ def dashboard():
 
 @app.route('/team/<team_id>')
 def team(team_id):
+    if 'user_id' not in session:
+        flash('Please Log in First!', category='error')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        cur = db.connection.cursor()
+        cur.execute("UPDATE comprised SET role=%s WHERE user_id=%s and team_id=%s", ("admin", session['user_id'], team_id))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=team_id))
+
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM team WHERE team_id=%s", (team_id,))
     fetchdata = cur.fetchall()
@@ -56,7 +68,7 @@ def team(team_id):
     fetchdata2 = cur.fetchall()
     cur.close()
     cur = db.connection.cursor()
-    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s", (team_id,))
+    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s and plans.event_id=event.event_id", (team_id))
     fetchdata3 = cur.fetchall()
     cur.close()
     member = False
@@ -126,7 +138,7 @@ def create_event(team_id):
         cur = db.connection.cursor()
         datetime1 = data['date'] + " " + data['time'] + ":00"
         datetime2 = data['date'] + " " + data['time2'] + ":00"
-        cur.execute("INSERT INTO event (event_id, event_name, event_date, end_time, event_description, team) VALUES (%s, %s, %s, %s, %s, %s)", (event_id, data['name'], datetime1, datetime2, data['description'], team_id))
+        cur.execute("INSERT INTO event (event_id, event_name, event_date, event_description) VALUES (%s, %s, %s, %s)", (event_id, data['name'], datetime1, data['description']))
         cur.execute("INSERT INTO plans (team_id, event_id) VALUES (%s, %s)", (team_id, event_id))
         cur.execute("INSERT INTO hosted_at (venue_id, event_id) VALUES (%s, %s)", (data['venue'], event_id))
         cur.connection.commit()
