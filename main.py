@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'EventFlowDB'
+app.config['MYSQL_DB'] = 'eventflowdb'
 db = MySQL(app)
 
 
@@ -47,6 +47,18 @@ def dashboard():
 
 @app.route('/team/<team_id>')
 def team(team_id):
+    if 'user_id' not in session:
+        flash('Please Log in First!', category='error')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        cur = db.connection.cursor()
+        cur.execute("UPDATE comprised SET role=%s WHERE user_id=%s and team_id=%s", ("admin", session['user_id'], team_id))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=team_id))
+
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM team WHERE team_id=%s", (team_id,))
     fetchdata = cur.fetchall()
@@ -57,6 +69,7 @@ def team(team_id):
     cur.close()
     cur = db.connection.cursor()
     cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s", (team_id,))
+    cur.execute("SELECT plans.event_id, event_name, event_description, event_date FROM plans, event WHERE team_id=%s AND plans.event_id=event.event_id", (team_id,))
     fetchdata3 = cur.fetchall()
     cur.close()
     member = False
@@ -70,16 +83,44 @@ def team(team_id):
     return render_template("team.html", team=fetchdata[0], members=fetchdata2, member=member, admin=admin, events=fetchdata3)
 
 
-@app.route('/teams')
+@app.route('/teams', methods=['GET', 'POST'])
 def teams():
     if 'user_id' not in session:
         flash('Please Log in First!', category='error')
         return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        cur = db.connection.cursor()
+        cur.execute("INSERT INTO comprised (team_id, user_id, role) VALUES (%s, %s, %s)", (data['team_id'], session['user_id'], 'member'))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=data['team_id']))
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM team")
     fetchdata = cur.fetchall()
     cur.close()
     return render_template("teams.html", teams=fetchdata)
+
+
+@app.route('/create_team', methods=['GET', 'POST'])
+def create_team():
+    if 'user_id' not in session:
+        flash('Please Log in First!', category='error')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        data = request.form
+        cur = db.connection.cursor()
+        cur.execute("SELECT MAX(cast(team_id as unsigned)) FROM team")
+        fetchdata = cur.fetchall()
+        cur.close()
+        team_id = int(fetchdata[0][0]) + 1
+        cur = db.connection.cursor()
+        cur.execute("INSERT INTO team (team_id, team_name, description) VALUES (%s, %s, %s)", (team_id, data['team_name'], data['team_description'],))
+        cur.execute("INSERT INTO comprised (team_id, user_id, role) VALUES (%s, %s, %s)", (team_id, session['user_id'], 'admin'))
+        cur.connection.commit()
+        return redirect(url_for('team', team_id=team_id))
+    return render_template("create_team.html")
 
 
 @app.route('/create_event/<team_id>', methods=['GET', 'POST'])
@@ -98,7 +139,7 @@ def create_event(team_id):
         cur = db.connection.cursor()
         datetime1 = data['date'] + " " + data['time'] + ":00"
         datetime2 = data['date'] + " " + data['time2'] + ":00"
-        cur.execute("INSERT INTO event (event_id, event_name, event_date, end_time, event_description, team) VALUES (%s, %s, %s, %s, %s, %s)", (event_id, data['name'], datetime1, datetime2, data['description'], team_id))
+        cur.execute("INSERT INTO event (event_id, event_name, event_date, event_description) VALUES (%s, %s, %s, %s)", (event_id, data['name'], datetime1, data['description']))
         cur.execute("INSERT INTO plans (team_id, event_id) VALUES (%s, %s)", (team_id, event_id))
         cur.execute("INSERT INTO hosted_at (venue_id, event_id) VALUES (%s, %s)", (data['venue'], event_id))
         cur.connection.commit()
@@ -116,7 +157,27 @@ def event(event_id):
     cur.execute("SELECT building, room, max_people FROM hosted_at, venue WHERE event_id=%s and hosted_at.venue_id=venue.venue_id", (event_id,))
     fetchdata2 = cur.fetchall()
     cur.close()
-    return render_template("event.html", event=fetchdata[0], venue=fetchdata2[0])
+    cur = db.connection.cursor()
+    cur.execute("SELECT equipment_type, quantity, start_date, end_date FROM equipment, uses WHERE event_id=%s and equipment.equipment_id=uses.equipment_id", (event_id,))
+    fetchdata3 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT total_budget, remaining_budget, budget_description FROM budget, allocated WHERE event_id=%s and budget.budget_id=allocated.budget_id", (event_id,))
+    fetchdata4 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT purchase_description, purchase_amount, purchase_date FROM expenses, has WHERE event_id=%s and expenses.purchase_id=has.purchase_id", (event_id,))
+    fetchdata5 = cur.fetchall()
+    cur.close()
+    cur = db.connection.cursor()
+    cur.execute("SELECT user.user_id, role FROM user, comprised, plans WHERE user.user_id=%s and comprised.user_id=user.user_id and comprised.team_id=plans.team_id and plans.event_id=%s and user.user_id=comprised.user_id", (session['user_id'], event_id,))
+    fetchdata6 = cur.fetchall()
+    admin = True
+    for user in fetchdata6:
+        if user[1] == 'admin' and user[0] == session['user_id']:
+            admin = True
+    cur.close()
+    return render_template("event.html", event=fetchdata[0], venue=fetchdata2[0], equipments=fetchdata3, budgets=fetchdata4, expenses=fetchdata5, admin=admin)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -193,4 +254,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

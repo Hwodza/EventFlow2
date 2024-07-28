@@ -12,7 +12,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <p align="center">Event starts on {{ event[2]}} and ends on {{ event[3] }}</p>
+            <p align="center">Event starts on {{ event[2]}}</p>
         </div>
     </div>
     <div class="row">
@@ -51,6 +51,8 @@
                                 </div>
                                 <div class="card-body">
                                     <p>Quantity: {{ equipment[1] }}</p>
+                                    <p>Start Date: {{ equipment[2] }}</p>
+                                    <p>End Date: {{ equipment[3] }}</p>
                                 </div>
                             </div>
                         </div>
@@ -64,7 +66,16 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3>Budget</h3>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h3>Budget</h3>
+                        </div>
+                        {% if admin %}
+                            <div class="col-md-2">
+                                <a href="/{{ event[0] }}/add_budget/" class="btn btn-success">Add Budget</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -72,10 +83,15 @@
                             <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4>{{ budget[0] }}</h4>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h3>{{ budget[2] }}</h3>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-body">
-                                        <p>Amount: {{ budget[1] }}</p>
+                                        <p>Total: {{ budget[0] }}</p>
+                                        <p>Remaining: {{ budget[1] }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -89,7 +105,16 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3>Expenses</h3>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h3>Expenses</h3>
+                        </div>
+                        {% if admin %}
+                            <div class="col-md-2">
+                                <a href="/create_expense/{{ event[0] }}" class="btn btn-success">Create Expense</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">

@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
-<h1>{{ team[1] }}</h1>
+<h1 algin="center">{{ team[1] }}</h1>
 <div class="container-fluid">
     <div class="card">
         <div class="card-header">
@@ -58,6 +58,14 @@
                             </div>
                             <div class="card-footer">
                                 <a href="/profile/{{ member[0] }}" class="btn btn-primary">View Profile</a>
+                                {% if admin %}
+                                    <form method="Post">
+                                        <div class="form-group">
+                                            <input type="hidden" name="make_admin" value="{{ member[3] }}" />
+                                            <button type="submit" class="btn btn-success">Make Admin</button>
+                                        </div>
+                                    </form>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -68,10 +76,33 @@
     
 </div>
 <div class="container-fluid">
-    
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Past Events</h3>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Past Events</h3>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for event in past_events %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>{{ event[1] }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ event[2] }}</p>
+                                <p>{{ event[3] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/event/{{ event[0] }}" class="btn btn-primary">View Event</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
